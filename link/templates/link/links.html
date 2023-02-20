@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Links{% endblock %}
+
+{% block content %}
+    <h1 class="mb-6 text-xl">Links</h1>
+
+    <div class="mb-6 space-x-4 space-y-4">
+        {% for category in request.user.categories.all %}
+            <a href="{% url 'links:links' %}?category={{ category.id }}">{{ category.name }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="grid grid-cols-3 gap-3">
+        {% for link in links %}
+            <div class="bg-gray-100 p-6 rounded-xl">
+                <h2 class="mb-4 text-xl">{{ link.name }}</h2>
+
+                {% if link.description %}
+                    <p class="mb-4 text-xs">{{ link.description }}</p>
+                {% endif %}
+
+                <a href="{{ link.url }}" class="text-cyan-700" target="_blank">Open link</a>
+                |
+                <a href="{% url 'links:edit_link' link.id %}" class="text-cyan-700">Edit</a>
+                |
+                <a href="{% url 'links:delete_link' link.id %}" class="text-rose-700">Delete</a>
+            </div>
+        {% empty %}
+            <div class="bg-rose-200 p-6 rounded-xl">You don't have any links for this filter...</div>
+        {% endfor %}
+    </div>
+{% endblock %}

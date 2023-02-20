@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-xl">{{ title }}</h1>
+
+    <form method="post" action=".">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button class="mt-4 py-4 px-6 bg-cyan-500 text-white rounded-xl">Submit</button>
+    </form>
+{% endblock %}

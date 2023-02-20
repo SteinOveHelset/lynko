@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <title>{% block title %}{% endblock %} | Lynko</title>
+
+        <style>
+            body {
+            
+            
+                .StripeElement {
+                  box-sizing: border-box;
+            
+                  height: 40px;
+            
+                  padding: 10px 12px;
+            
+                  border: 1px solid transparent;
+                  border-radius: 4px;
+                  background-color: white;
+            
+                  box-shadow: 0 1px 3px 0 #e6ebf1;
+                  -webkit-transition: box-shadow 150ms ease;
+                  transition: box-shadow 150ms ease;
+                }
+            
+                .StripeElement--focus {
+                  box-shadow: 0 1px 3px 0 #cfd7df;
+                }
+            
+                .StripeElement--invalid {
+                  border-color: #fa755a;
+                }
+            
+                .StripeElement--webkit-autofill {
+                  background-color: #fefde5 !important;
+                }
+                .hidden {
+                    display: none;
+                }
+            
+            
+                #submit:hover {
+                  filter: contrast(120%);
+                }
+            
+                #submit {
+                  font-feature-settings: "pnum";
+                  --body-color: #f7fafc;
+                  --button-color: #556cd6;
+                  --accent-color: #556cd6;
+                  --gray-border: #e3e8ee;
+                  --link-color: #fff;
+                  --font-color: #697386;
+                  --body-font-family: -apple-system,BlinkMacSystemFont,sans-serif;
+                  --radius: 4px;
+                  --form-width: 400px;
+                  -webkit-box-direction: normal;
+                  word-wrap: break-word;
+                  box-sizing: border-box;
+                  font: inherit;
+                  overflow: visible;
+                  -webkit-appearance: button;
+                  -webkit-font-smoothing: antialiased;
+                  margin: 0;
+                  font-family: inherit;
+                  -webkit-tap-highlight-color: transparent;
+                  font-size: 16px;
+                  padding: 0 12px;
+                  line-height: 32px;
+                  outline: none;
+                  text-decoration: none;
+                  text-transform: none;
+                  margin-right: 8px;
+                  height: 36px;
+                  border-radius: var(--radius);
+                  color: #fff;
+                  border: 0;
+                  margin-top: 16px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  transition: all .2s ease;
+                  display: block;
+                  box-shadow: 0 4px 5.5px 0 rgba(0,0,0,.07);
+                  width: 100%;
+                  background: var(--button-color);
+                }
+            
+            </style>
+    </head>
+
+    <body>
+        <nav class="p-6 flex items-center justify-between bg-gray-800">
+            <a href="/" class="text-xl text-cyan-500">Lynko</a>
+
+            <div class="space-x-4">
+                <a href="{% url 'core:about' %}" class="text-white">About</a>
+                <a href="{% url 'core:pricing' %}" class="text-white">Pricing</a>
+
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'links:links' %}" class="text-white">Links</a>
+                    <a href="{% url 'dashboard:dashboard' %}" class="text-white">Dashboard</a>
+                    <a href="{% url 'links:categories' %}" class="text-white">Categories</a>
+                    <a href="{% url 'links:create_link' %}" class="py-4 px-6 bg-emerald-600 text-white rounded-xl">Create link</a>
+                    <a href="{% url 'accounts:logout' %}" class="py-4 px-6 bg-rose-600 text-white rounded-xl">Log out</a>
+                {% else %}
+                    <a href="{% url 'accounts:signup' %}" class="py-4 px-6 bg-cyan-600 text-white rounded-xl">Sign up</a>
+                    <a href="{% url 'accounts:login' %}" class="py-4 px-6 bg-gray-600 text-white rounded-xl">Log in</a>
+                {% endif %}
+            </div>
+        </nav>
+
+        <main class="p-6">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <footer class="p-6 bg-gray-900">
+            <p class="text-xs text-gray-400">Copyright (c) 2023 - Lynko</p>
+        </footer>
+    </body>
+
+    <script>
+        document.getElementById("submit").disabled = true;
+
+stripeElements();
+
+function stripeElements() {
+  stripe = Stripe('pk_test_E52Nh0gTCRpJ7h4JhuEX7BIO006LVew6GG');
+
+  if (document.getElementById('card-element')) {
+    let elements = stripe.elements();
+
+    // Card Element styles
+    let style = {
+      base: {
+        color: "#32325d",
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: "antialiased",
+        fontSize: "16px",
+        "::placeholder": {
+          color: "#aab7c4"
+        }
+      },
+      invalid: {
+        color: "#fa755a",
+        iconColor: "#fa755a"
+      }
+    };
+
+
+    card = elements.create('card', { style: style });
+
+    card.mount('#card-element');
+
+    card.on('focus', function () {
+      let el = document.getElementById('card-errors');
+      el.classList.add('focused');
+    });
+
+    card.on('blur', function () {
+      let el = document.getElementById('card-errors');
+      el.classList.remove('focused');
+    });
+
+    card.on('change', function (event) {
+      displayError(event);
+    });
+  }
+  //we'll add payment form handling here
+}
+
+function displayError(event) {
+ 
+  let displayError = document.getElementById('card-errors');
+  if (event.error) {
+    displayError.textContent = event.error.message;
+  } else {
+    displayError.textContent = '';
+  }
+}
+
+function planSelect(name, price, priceId) {
+    var inputs = document.getElementsByTagName('input');
+
+    for(var i = 0; i<inputs.length; i++){
+      inputs[i].checked = false;
+      if(inputs[i].name== name){
+
+        inputs[i].checked = true;
+      }
+    }
+
+    var n = document.getElementById('plan');
+    var p = document.getElementById('price');
+    var pid = document.getElementById('priceId');
+    n.innerHTML = name;
+    p.innerHTML = price;
+    pid.innerHTML = priceId;
+        document.getElementById("submit").disabled = false;
+
+
+  }
+
+  //we'll add payment form handling here
+  let paymentForm = document.getElementById('subscription-form');
+  if (paymentForm) {
+
+    paymentForm.addEventListener('submit', function (evt) {
+      evt.preventDefault();
+      changeLoadingState(true);
+
+
+        // create new payment method & create subscription
+        createPaymentMethod({ card });
+    });
+  }
+
+  function createPaymentMethod({ card }) {
+
+    // Set up payment method for recurring usage
+    let billingName = '{{user.username}}';
+  
+    stripe
+      .createPaymentMethod({
+        type: 'card',
+        card: card,
+        billing_details: {
+          name: billingName,
+        },
+      })
+      .then((result) => {
+        if (result.error) {
+          displayError(result);
+        } else {
+         const paymentParams = {
+            price_id: document.getElementById("priceId").innerHTML,
+            payment_method: result.paymentMethod.id,
+        };
+        fetch("/create-sub/", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken':'{{ csrf_token }}',
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify(paymentParams),
+        }).then((response) => {
+          return response.json(); 
+        }).then((result) => {
+          if (result.error) {
+            // The card had an error when trying to attach it to a customer
+            throw result;
+          }
+          return result;
+        }).then((result) => {
+          if (result && result.status === 'active') {
+  
+           window.location.href = '/complete/';
+          };
+        }).catch(function (error) {
+            displayError(result.error.message);
+  
+        });
+        }
+      });
+  }
+  
+  
+  var changeLoadingState = function(isLoading) {
+    if (isLoading) {
+      document.getElementById("submit").disabled = true;
+      document.querySelector("#spinner").classList.remove("hidden");
+      document.querySelector("#button-text").classList.add("hidden");
+    } else {
+      document.getElementById("submit").disabled = false;
+      document.querySelector("#spinner").classList.add("hidden");
+      document.querySelector("#button-text").classList.remove("hidden");
+    }
+  };
+</script>
+</html>

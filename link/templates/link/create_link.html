@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-xl">{{ title }}</h1>
+
+    {% if request.user.links.all.count >= request.user.plan.max_num_links %}
+        <div class="mt-6 p-6 bg-rose-600 text-white rounded-xl">
+            You have reached the top of you plan!
+        </div>
+    {% else %}
+        <form method="post" action=".">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button class="mt-4 py-4 px-6 bg-cyan-500 text-white rounded-xl">Submit</button>
+        </form>
+    {% endif %}
+{% endblock %}
